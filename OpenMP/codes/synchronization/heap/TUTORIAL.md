@@ -344,7 +344,7 @@ The **real bug** in this version is subtle and appears in the task creation code
 ```c
 llnode_t *start = head;  // Line 607: shared variable
 
-#pragma omp task  // ⚠️ BUG: missing firstprivate(start, head)
+#pragma omp task  //  BUG: missing firstprivate(start, head)
 {
     for (int batch = 0; batch < this_batch_size; batch++) {
         int new_value = lrand48() % norm;

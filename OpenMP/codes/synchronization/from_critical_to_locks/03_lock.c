@@ -205,7 +205,7 @@ int main ( int argc, char **argv )
 	    // need to update
 	    
 	    int _lock_;
-	   #pragma omp atomic capture
+	   #pragma omp atomic capture 
 	    { _lock_ = P[idx].lock; P[idx].lock = 1; }
 	    
 	    if ( _lock_ == 0 ) 
