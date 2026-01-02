@@ -24,49 +24,54 @@
  │                                                                            │
  * ────────────────────────────────────────────────────────────────────────── */
 
-
 #if defined(__STDC__)
-#  if (__STDC_VERSION__ >= 199901L)
-#     define _XOPEN_SOURCE 700
-#  endif
+#if (__STDC_VERSION__ >= 199901L)
+#define _XOPEN_SOURCE 700
 #endif
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
+#endif
 #include <math.h>
 #include <omp.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
-
-int main( int argc, char **argv )
-{
- #pragma omp parallel
+int main(int argc, char **argv) {
+#pragma omp parallel
   {
 
-    #pragma omp single
+#pragma omp single
     {
-      printf( " »Yuk yuk, here is thread %d from "
-	      "within the single region\n", omp_get_thread_num() );
-      
-      #pragma omp task
-      {
-	printf( "\tHi, here is thread %d "
-		"running task A\n", omp_get_thread_num() );
-      }
-      
-     #pragma omp task
-      {
-	printf( "\tHi, here is thread %d "
-		"running task B\n", omp_get_thread_num() );
+      printf(" »Yuk yuk, here is thread %d from "
+             "within the single region\n",
+             omp_get_thread_num());
+
+      // NOTE: You can also do this
+      for (int i = 0; i < 2; i++) {
+#pragma omp task
+        {
+          printf("\tHi, here is thread %d "
+                 "running task A\n",
+                 omp_get_thread_num());
+        }
       }
 
+      // #pragma omp task
+      //       {
+      //         printf("\tHi, here is thread %d "
+      //                "running task B\n",
+      //                omp_get_thread_num());
+      //       }
+      //
+      // NOTE: here I will wait and the task will run
+      // But I don't know when task will start running
     }
 
     printf(" :Hi, here is thread %d after the end "
-	   "of the single region, I was stuck waiting "
-	   "all the others\n", omp_get_thread_num() );    
+           "of the single region, I was stuck waiting "
+           "all the others\n",
+           omp_get_thread_num());
   }
 
   return 0;
-  
 }

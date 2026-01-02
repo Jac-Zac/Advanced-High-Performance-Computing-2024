@@ -2,8 +2,8 @@
 
  * EXAMPLE 1: Simple Success Case
  * ============================================================================
- * 
- * PURPOSE: Demonstrate a loop that vectorizes successfully with clear 
+ *
+ * PURPOSE: Demonstrate a loop that vectorizes successfully with clear
  *          compiler reports showing what optimizations were applied.
  *
  * LEARNING GOALS:
@@ -12,11 +12,13 @@
  * - Recognize key phrases: "vectorized", "loop", "iterations"
  *
  * COMPILE WITH:
- *   gcc -O3 -march=native -ftree-vectorize -fopt-info-vec-all 01_simple_success.c -o success
+ *   gcc -O3 -march=native -ftree-vectorize -fopt-info-vec-all
+ 01_simple_success.c -o success
  *
  * EXPECTED OUTPUT (GCC):
  *   01_simple_success.c:32:5: optimized: loop vectorized using 16 byte vectors
- *   01_simple_success.c:32:5: optimized:  loop versioned for vectorization because of possible aliasing
+ *   01_simple_success.c:32:5: optimized:  loop versioned for vectorization
+ because of possible aliasing
  *
  * KEY OBSERVATIONS:
  * - "optimized: loop vectorized" = SUCCESS!
@@ -25,46 +27,53 @@
  *
  *
  *  »»»»»» QUESTIONS
- *  [1] when compiling for x86_64 you should get multiple messages about the loop
+ *  [1] when compiling for x86_64 you should get multiple messages about the
+ loop
  *      in function vector_add being vectorized with different vector sizes.
  *      Why is that so?
- *  [2] you should get the above mentioned group of messages twice. Why is that so?
+ *  [2] you should get the above mentioned group of messages twice. Why is that
+ so?
  * ============================================================================
  */
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define N 1000000
 
+// NOTE: It is good to put const here because I'm not modifying b and c
+// And it also helps the compiler because nobody is going to us it during write
+// NOTE: Moreover
 // Simple vector addition - textbook vectorizable loop
-void vector_add(double * restrict a, const double * restrict b, 
-                const double * restrict c, int n)
-{
-    for (int i = 0; i < n; i++) {
-        a[i] = b[i] + c[i];
-    }
+// This will probably inline things automatically
+inline void vector_add(double *restrict a, const double *restrict b,
+                       const double *restrict c, int n) {
+  for (int i = 0; i < n; i++) {
+    a[i] = b[i] + c[i];
+  }
 }
 
 int main(int argc, char **argv) {
-    int n = (argc > 1) ? atoi(argv[1]) : N;
-    
-    double *a = (double*)malloc(n * sizeof(double));
-    double *b = (double*)malloc(n * sizeof(double));
-    double *c = (double*)malloc(n * sizeof(double));
-    
-    // Initialize
-    for (int i = 0; i < n; i++) {
-        b[i] = (double)i;
-        c[i] = (double)(i * 2);
-    }
-    
-    // Execute
-    vector_add(a, b, c, n);
-    
-    // Prevent dead code elimination
-    printf("Result: a[0] = %g, a[%d] = %g\n", a[0], n-1, a[n-1]);
-    
-    free(c); free(b); free(a);
-    return 0;
+  int n = (argc > 1) ? atoi(argv[1]) : N;
+
+  double *a = (double *)malloc(n * sizeof(double));
+  double *b = (double *)malloc(n * sizeof(double));
+  double *c = (double *)malloc(n * sizeof(double));
+
+  // Initialize
+  for (int i = 0; i < n; i++) {
+    b[i] = (double)i;
+    c[i] = (double)(i * 2);
+  }
+
+  // Execute
+  vector_add(a, b, c, n);
+
+  // Prevent dead code elimination
+  printf("Result: a[0] = %g, a[%d] = %g\n", a[0], n - 1, a[n - 1]);
+
+  free(c);
+  free(b);
+  free(a);
+  return 0;
 }

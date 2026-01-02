@@ -24,61 +24,57 @@
  │                                                                            │
  * ────────────────────────────────────────────────────────────────────────── */
 
-
 #if defined(__STDC__)
-#  if (__STDC_VERSION__ >= 199901L)
-#     define _XOPEN_SOURCE 700
-#  endif
+#if (__STDC_VERSION__ >= 199901L)
+#define _XOPEN_SOURCE 700
 #endif
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
+#endif
 #include <math.h>
 #include <omp.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
+int main(int argc, char **argv) {
 
-
-int main( int argc, char **argv )
-{
-
- #pragma omp parallel
+#pragma omp parallel
   {
     int me = omp_get_thread_num();
 
-    #pragma omp single nowait
+#pragma omp single nowait
     {
-      printf( " »Yuk yuk, here is thread %d from "
-	      "within the single region\n", omp_get_thread_num() );
-      
-      #pragma omp task
+      printf(" »Yuk yuk, here is thread %d from "
+             "within the single region\n",
+             omp_get_thread_num());
+
+#pragma omp task
       {
-	printf( "\tHi, here is thread %d "
-		"running task A\n", omp_get_thread_num() );
-      }
-      
-     #pragma omp task
-      {
-	printf( "\tHi, here is thread %d "
-		"running task B\n", omp_get_thread_num() );
+        printf("\tHi, here is thread %d "
+               "running task A\n",
+               omp_get_thread_num());
       }
 
      #pragma omp taskwait
       fflush(stdout);
       printf(" «Yuk yuk, it is still me, thread %d "
-	     "inside single region after all tasks ended\n", me);
-      
+             "inside single region after all tasks ended\n",
+             me);
     }
 
-   #pragma omp taskwait
+    // WARNING: Will wait for the task inside the {} so this has no
+    // corresponding task so using it or commented is the same thing
+#pragma omp taskwait
+
+#pragma omp barrier
 
     //#pragma omp barrier
     
     printf(" :Hi, here is thread %d after the end "
-	   "of the single region, I'm stuck waiting "
-	   "all the others\n", omp_get_thread_num() );    
+           "of the single region, I'm stuck waiting "
+           "all the others\n",
+           omp_get_thread_num());
   }
 
   return 0;
-  
 }

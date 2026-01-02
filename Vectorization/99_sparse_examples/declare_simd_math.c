@@ -1,4 +1,5 @@
 
+#include "../headers/timing.h"
 #include <math.h>
 #include <omp.h>
 #include <stdio.h>
@@ -8,9 +9,7 @@
 #include "../headers/timing.h"
 
 #pragma omp declare simd notinbranch simdlen(8) uniform(b)
-double f(double a, double b){
-    return sin(a) + a*b;
-}
+double f(double a, double b) { return sin(a) + a * b; }
 
 double loop_plain(double *x, double b, int n)
 {
